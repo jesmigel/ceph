@@ -1,0 +1,15 @@
+binaries:
+- gnupg
+- software-properties-common
+- curl
+- ntp
+- make
+- python3-venv
+- gcc
+- zsh
+
+handler_list:
+- restart ntp
+
+# DATETIME
+timezone: "Australia/Melbourne"
