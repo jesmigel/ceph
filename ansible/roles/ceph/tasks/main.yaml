@@ -1,0 +1,15 @@
+---
+- name: Apply prerequisites
+  import_tasks: prerequisites.yaml
+- name: Bootstrap ceph monitor and manager configuration
+  import_tasks: mon_mgr.yaml
+- name: up all Object Storage Daemon
+  import_tasks: osd.yaml
+- name: up RADOS Gateway
+  import_tasks: radosgw.yaml
+- name: up Metadata Server
+  import_tasks: metadata.yaml
+- name: Bootstrap Dashboard
+  import_tasks: dashboard.yaml
+- name: Post deployment configuration RADOSGW
+  import_tasks: radosgw_rbac.yaml

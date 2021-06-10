@@ -1,0 +1,42 @@
+---
+# Create Directory
+- name: Create docker-compose directory
+  ansible.builtin.file:
+    path: "{{ ceph_path_project }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0775'
+  tags:
+  - prerequisites
+
+# Create Template
+- name: Generate docker-compose from template
+  ansible.builtin.template:
+    src: "{{ ceph_compose_template }}"
+    dest: "{{ ceph_path_project }}/docker-compose.yaml"
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+  tags:
+  - prerequisites
+
+# Create Network
+- name: Create a network with IPv6 and custom IPv4 IPAM config
+  community.docker.docker_network:
+    name: "{{ ceph_docker_config.DOCKER_NETWORK }}"
+    enable_ipv6: no
+    ipam_config:
+      - subnet: "{{ ceph_docker_config.MON1_CEPH_PUBLIC_NETWORK }}"
+  tags:
+  - prerequisites
+
+# Pull Images
+- name: Pull Ceph docker images
+  community.docker.docker_compose:
+    project_src: "{{ ceph_path_project }}"
+    pull: yes
+    stopped: yes
+  register: output
+  tags:
+  - prerequisites

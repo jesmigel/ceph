@@ -1,0 +1,17 @@
+---
+# Up Dashboard
+- name: Up dashboard
+  ansible.builtin.command:
+    cmd: "docker-compose exec mon1 ceph mgr module enable dashboard"
+  args:
+    chdir: "{{ ceph_path_project }}"
+  register: output
+
+# Bootstrap Dashboard
+- name: Bootstrap dashboard
+  ansible.builtin.command:
+    cmd: "docker-compose exec {{ item }}"
+  args:
+    chdir: "{{ ceph_path_project }}"
+  loop: "{{ ceph_dashboard_bootstrap }}"
+  register: output

@@ -1,0 +1,36 @@
+---
+# Up MON MGR
+- name: Start service MON MGR
+  community.docker.docker_compose:
+    project_src: "{{ ceph_path_project }}"
+    services:
+    - mon1
+    - mgr
+  register: output
+
+- name: "[ASSERT] Start service MON MGR"
+  ansible.builtin.assert:
+    that:
+      - "output.services.mon1.compose_mon1_1.state.running"
+      - "output.services.mgr.compose_mgr_1.state.running"
+
+# Update CONF
+- name: Update Ceph configuration
+  lineinfile:
+    state: present
+    path: "{{ ceph_path_volume }}/ceph/ceph/ceph.conf"
+    line: "{{ item }}"
+  loop: "{{ ceph_app_conf_EOF }}"
+  become: yes
+  register: output
+
+# Restart MON MGR
+- name: Restart services MON MGR
+  community.docker.docker_compose:
+    project_src: "{{ ceph_path_project }}"
+    services:
+    - mon1
+    - mgr
+    build: no
+    restarted: yes
+  register: output

@@ -1,0 +1,42 @@
+---
+# Create RADOSGW RBAC
+- name: RADOSGW RBAC
+  ansible.builtin.command:
+    cmd: "docker-compose exec {{ ceph_rados }}"
+  args:
+    chdir: "{{ ceph_path_project }}"
+  register: output
+
+# GET KEYS mon1 radosgw-admin user info --uid={{ ceph_docker_config.RADOS_UID }}
+- name: get RADOSGW RBAC
+  ansible.builtin.shell:
+    cmd: "docker-compose exec mon1 radosgw-admin user info --uid={{ ceph_docker_config.RADOS_UID }}"
+    chdir: "{{ ceph_path_project }}"
+  register: output
+  tags:
+  - rados_rbac
+
+# Set output as fact
+- name: Set json output as fact
+  set_fact:
+    ceph_rados_rbac: "{{ output.stdout | from_json }}"
+  tags:
+  - rados_rbac
+
+# Set RADOSGW access key
+- name: Set RADOSGW access key
+  ansible.builtin.command:
+    cmd: "docker-compose exec mon1 ceph dashboard set-rgw-api-access-key {{ ceph_rados_rbac['keys'][0]['access_key'] }}"
+  args:
+    chdir: "{{ ceph_path_project }}"
+  tags:
+  - rados_rbac
+
+# Set RADOSGW secret key
+- name: Set RADOSGW access key
+  ansible.builtin.command:
+    cmd: "docker-compose exec mon1 ceph dashboard set-rgw-api-secret-key {{ ceph_rados_rbac['keys'][0]['secret_key'] }}"
+  args:
+    chdir: "{{ ceph_path_project }}"
+  tags:
+  - rados_rbac

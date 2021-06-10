@@ -1,0 +1,18 @@
+---
+# Up RADOSGW
+- name: Start service RADOSGW
+  community.docker.docker_compose:
+    project_src: "{{ ceph_path_project }}"
+    services:
+    - rgw1
+  register: output
+
+- name: "[ASSERT] Start service RADOSGW"
+  ansible.builtin.assert:
+    that:
+      - "output.services.mon1.compose_mon1_1.state.running"
+      - "output.services.mgr.compose_mgr_1.state.running"
+      - "output.services.osd1.compose_osd1_1.state.running"
+      - "output.services.osd2.compose_osd2_1.state.running"
+      - "output.services.osd3.compose_osd3_1.state.running"
+      - "output.services.rgw1.compose_rgw1_1.state.running"

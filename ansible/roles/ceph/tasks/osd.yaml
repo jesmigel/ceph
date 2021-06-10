@@ -1,0 +1,19 @@
+---
+# Up OSDs
+- name: Start service OSDs
+  community.docker.docker_compose:
+    project_src: "{{ ceph_path_project }}"
+    services:
+    - osd1
+    - osd2
+    - osd3
+  register: output
+
+- name: "[ASSERT] Start service OSDs"
+  ansible.builtin.assert:
+    that:
+      - "output.services.mon1.compose_mon1_1.state.running"
+      - "output.services.mgr.compose_mgr_1.state.running"
+      - "output.services.osd1.compose_osd1_1.state.running"
+      - "output.services.osd2.compose_osd2_1.state.running"
+      - "output.services.osd3.compose_osd3_1.state.running"
