@@ -4,6 +4,7 @@ _VM=time vagrant
 
 clean:
 	$(call venv_exec,.venv,$(_VM) destroy)
+	rm -rf .vagrant
 
 config:
 	$(call venv_exec,.venv,$(_VM) validate)
