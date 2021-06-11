@@ -1,17 +1,121 @@
 ---
-# Up Dashboard
-- name: Up dashboard
-  ansible.builtin.command:
-    cmd: "docker-compose exec mon1 ceph mgr module enable dashboard"
-  args:
-    chdir: "{{ ceph_path_project }}"
-  register: output
-
-# Bootstrap Dashboard
+# # Bootstrap Dashboard
+# - name: Bootstrap dashboard
+#   ansible.builtin.command:
+#     cmd: "docker-compose exec {{ item }}"
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   loop: "{{ ceph_dashboard_bootstrap }}"
+#   loop_control:
+#     pause: 5
+#   register: output
+# BOOTSRAP V2
 - name: Bootstrap dashboard
   ansible.builtin.command:
-    cmd: "docker-compose exec {{ item }}"
+    cmd: "docker-compose exec {{ item.cmd }}"
   args:
     chdir: "{{ ceph_path_project }}"
-  loop: "{{ ceph_dashboard_bootstrap }}"
-  register: output
+  until: result.stdout.find("{{ item.assert }}") != -1
+  retries: 5
+  delay: 10
+  loop: "{{ ceph_cmd_dashboard }}"
+  register: result
+  tags:
+  - dashboard
+
+# # Disable Dashboard
+# - name: Disable Dashboard
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_disable.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_disable.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Enable Dashboard
+# - name: Enable Dashboard
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_enable.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_enable.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Create CERT
+# - name: Create CERT
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_cert.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_cert.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Disable Dashboard
+# - name: Disable Dashboard
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_disable.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_disable.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Restart Dashboard
+# - name: Restart Dashboard
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_enable.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_enable.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Configure server addr
+# - name: Configure server addr
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_config_server_addr.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_config_server_addr.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Configure server port
+# - name: Configure server port
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_config_server_port.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_config_server_port.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+# 
+# # Configure user
+# - name: Configure user
+#   ansible.builtin.shell: "docker-compose exec {{ ceph_cmd_dashboard_config_id.cmd }}"
+#   register: result
+#   args:
+#     chdir: "{{ ceph_path_project }}"
+#   until: result.stdout.find("{{ ceph_cmd_dashboard_config_id.assert }}") != -1
+#   retries: 5
+#   delay: 3
+#   tags:
+#   - dashboard
+#

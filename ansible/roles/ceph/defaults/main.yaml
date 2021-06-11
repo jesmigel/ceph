@@ -1,6 +1,7 @@
 ceph_path_project: /home/vagrant/compose
 ceph_path_volume: /home/vagrant/compose/vol
 ceph_compose_template: docker-compose.yaml.jinja2
+
 ceph_docker_config:
   COMPOSE_VERSION: 3
   CEPH_CONTAINER_VERSION: v3.1.0-stable-3.1-mimic-centos-7
@@ -29,6 +30,52 @@ ceph_app_conf_EOF:
 - cephx service require signatures = false
 - osd max object name len = 256
 - osd max object namespace len = 64
+
+ceph_cmd_dashboard:
+- cmd: mon1 ceph mgr module disable dashboard
+  assert: module 'dashboard' is already disabled
+- cmd: mon1 ceph mgr module enable dashboard
+  assert: module 'dashboard' is already enabled
+- cmd: mon1 ceph dashboard create-self-signed-cert
+  assert: Self-signed certificate created
+- cmd: mon1 ceph mgr module disable dashboard
+  assert: module 'dashboard' is already disabled
+- cmd: mon1 ceph mgr module enable dashboard
+  assert: module 'dashboard' is already enabled
+- cmd: mon1 bash -c "ceph config set mgr mgr/dashboard/server_addr mgr && ceph config get mgr.unknown mgr/dashboard/server_addr"
+  assert: mgr
+- cmd: mon1 bash -c "ceph config set mgr mgr/dashboard/server_port 8443 && ceph config get mgr.unknown mgr/dashboard/server_port"
+  assert: 8443
+- cmd: mon1 ceph dashboard set-login-credentials {{ ceph_docker_config.USERNAME }} {{ ceph_docker_config.PASSWORD }}
+  assert: Username and password updated
+- cmd: mon1 ceph mgr module disable dashboard
+  assert: module 'dashboard' is already disabled
+- cmd: mon1 ceph mgr module enable dashboard
+  assert: module 'dashboard' is already enabled
+
+ceph_cmd_dashboard_enable:
+  cmd: mon1 ceph mgr module enable dashboard
+  assert: module 'dashboard' is already enabled
+
+ceph_cmd_dashboard_disable:
+  cmd: mon1 ceph mgr module disable dashboard
+  assert: module 'dashboard' is already disabled
+
+ceph_cmd_dashboard_cert:
+  cmd: mon1 ceph dashboard create-self-signed-cert
+  assert: Self-signed certificate created
+
+ceph_cmd_dashboard_config_server_addr:
+  cmd: mon1 bash -c "ceph config set mgr mgr/dashboard/server_addr mgr && ceph config get mgr.unknown mgr/dashboard/server_addr"
+  assert: mgr
+
+ceph_cmd_dashboard_config_server_port:
+  cmd: mon1 bash -c "ceph config set mgr mgr/dashboard/server_port 8443 && ceph config get mgr.unknown mgr/dashboard/server_port"
+  assert: 8443
+
+ceph_cmd_dashboard_config_id:
+  cmd: mon1 ceph dashboard set-login-credentials {{ ceph_docker_config.USERNAME }} {{ ceph_docker_config.PASSWORD }}
+  assert: Username and password updated
 
 ceph_dashboard_bootstrap:
 - mon1 ceph mgr module enable dashboard
